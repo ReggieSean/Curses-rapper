@@ -11,6 +11,6 @@ Curses::CellReference Curses::RowReference::at(int col) {
   return temp;
 }
 Curses::CellReference Curses::RowReference::operator[](int col) {
-  Curses::CellReference temp=Curses::RowReference::at(col);
+  Curses::CellReference temp=this->at(col);
   return temp;
 }

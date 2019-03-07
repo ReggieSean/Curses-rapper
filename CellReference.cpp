@@ -6,6 +6,6 @@
 Curses::CellReference::CellReference(Curses::Window &win_arg, const int row_arg, const int col_arg):win(win_arg),row(row_arg),col(col_arg) {};
 
 Curses::CellReference& Curses::CellReference::operator=(const char letter) {
-
-  //return *this;
+  this->win.addCharacter(this->row,this->col,letter);
+  return *this;
 }

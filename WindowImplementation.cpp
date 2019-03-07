@@ -92,10 +92,14 @@ std::string Curses::WindowImplementation::getStringInput() {
 
 void Curses::WindowImplementation::addCharacter(int row, int col, char value) {
   moveCursor(row,col);
-  addCharacter(value);
+  mvwaddch(cursesWindow.get(),row, col,value);
   if (!cursor_on){
     wmove(cursesWindow.get(),row,col);
-  }
+  }/*else{
+    int cursorx=getcurx(cursesWindow.get());
+    int cursory=getcury(cursesWindow.get());
+    moveCursor(cursory,cursorx);
+  }*/
 }
 
 void Curses::WindowImplementation::addCharacter(char value) {
@@ -104,17 +108,23 @@ void Curses::WindowImplementation::addCharacter(char value) {
   waddch(cursesWindow.get(),value);
   if (!cursor_on){
     wmove(cursesWindow.get(),cursory,cursorx);
-  }
+  }/*else{
+    cursorx=getcurx(cursesWindow.get());
+    cursory=getcury(cursesWindow.get());
+    moveCursor(cursory,cursorx+1);
+  }*/
 }
 
 void Curses::WindowImplementation::addString(int row, int col, const std::string& str) {
   moveCursor(row,col);
-  int cursorx=getcurx(cursesWindow.get());
-  int cursory=getcury(cursesWindow.get());
-  mvwaddstr(cursesWindow.get(),cursory,cursorx,str.c_str());
+  mvwaddstr(cursesWindow.get(),row,col,str.c_str());
   if (!cursor_on){
-    wmove(cursesWindow.get(),cursory,cursorx);
-  }
+    wmove(cursesWindow.get(),row,col);
+  }/*else{
+    int cursorx=getcurx(cursesWindow.get());
+    int cursory=getcury(cursesWindow.get());
+    moveCursor(cursory,cursorx+1);
+  }*/
 }
 
 void Curses::WindowImplementation::addString(const std::string& str) {
@@ -123,7 +133,11 @@ void Curses::WindowImplementation::addString(const std::string& str) {
   waddstr(cursesWindow.get(),str.c_str());
   if (!cursor_on){
     wmove(cursesWindow.get(),cursory,cursorx);
-  }
+  }/*else{
+    cursorx=getcurx(cursesWindow.get());
+    cursory=getcury(cursesWindow.get());
+    moveCursor(cursory,cursorx+1);
+  }*/
 }
 
 int Curses::WindowImplementation::getRowStart() const {
@@ -150,7 +164,9 @@ int Curses::WindowImplementation::getCurCol() const {
   return getcurx(cursesWindow.get());
 }
 
-void Curses::WindowImplementation::moveCursor(int row, int col) {
+void Curses::WindowImplementation::moveCursor(int row_arg, int col_arg) {
+  int row= row_arg;
+  int col= col_arg;
   if (row>=getmaxy(cursesWindow.get())){
     row=getmaxy(cursesWindow.get())-1;
   }
@@ -219,7 +235,9 @@ void Curses::WindowImplementation::setAdvanceCursorOff() {
 }
 
 Curses::RowReference Curses::WindowImplementation::at(int row) {
-  return RowReference();
+
+  Curses::RowReference temp=RowReference(*this,row);
+  return temp;
 }
 
 Curses::RowReference Curses::WindowImplementation::operator[](int row) {
@@ -232,7 +250,14 @@ void Curses::WindowImplementation::refresh() {
 }
 
 void Curses::WindowImplementation::log(std::ostream& out) {
+  moveCursor(0,0);
+  for(int row=0;row<getmaxy(cursesWindow.get());row++){
+    for(int col=0;col<getmaxx(cursesWindow.get());col++){
+      out<<getWindowChar(row,col);
+    }
+    out<<'\n';
 
+  }
 }
 
 
